@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support - TechStore</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+</head>
+
+<body class="bg-gray-50">
+  <nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between">
+        <div class="flex space-x-7">
+          <div>
+            <a href="/" class="flex items-center py-4 px-2">
+              <span class="font-semibold text-gray-500 text-lg">TechStore</span>
+            </a>
+          </div>
+          <div class="hidden md:flex items-center space-x-1">
+            <a href="/" class="py-4 px-2 text-gray-500 hover:text-gray-700">Home</a>
+            <a href="/products" class="py-4 px-2 text-gray-500 hover:text-gray-700">Products</a>
+            <a href="/support" class="py-4 px-2 text-gray-500 hover:text-gray-700">Support</a>
+            <a href="/about" class="py-4 px-2 text-gray-500 hover:text-gray-700">About</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <a href="#" class="py-2 px-2 text-gray-500 hover:text-gray-700">Cart (0)</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold text-center mb-12">Support Center</h1>
+
+    <!-- Search Support -->
+    <div class="max-w-2xl mx-auto mb-12">
+      <input type="text" placeholder="How can we help you?"
+        class="w-full px-6 py-4 rounded-full border focus:outline-none focus:ring-2 focus:ring-gray-300">
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <a href="#faq" class="support-card" data-framer-motion="fadeIn">
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-xl font-semibold mb-2">FAQ</h3>
+          <p class="text-gray-600">Find answers to common questions</p>
+        </div>
+      </a>
+      <a href="#contact" class="support-card" data-framer-motion="fadeIn" data-framer-delay="0.2">
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-xl font-semibold mb-2">Contact Us</h3>
+          <p class="text-gray-600">Get in touch with our team</p>
+        </div>
+      </a>
+      <a href="#shipping" class="support-card" data-framer-motion="fadeIn" data-framer-delay="0.4">
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-xl font-semibold mb-2">Shipping Info</h3>
+          <p class="text-gray-600">Track your order and delivery</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="mb-12">
+      <h2 class="text-3xl font-bold mb-8">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <div class="faq-item bg-white p-6 rounded-lg shadow-md" data-framer-motion="slideIn">
+          <h3 class="text-xl font-semibold mb-2">How do I track my order?</h3>
+          <p class="text-gray-600">You can track your order using the tracking number provided in your shipping
+            confirmation email.</p>
+        </div>
+        <div class="faq-item bg-white p-6 rounded-lg shadow-md" data-framer-motion="slideIn" data-framer-delay="0.2">
+          <h3 class="text-xl font-semibold mb-2">What is your return policy?</h3>
+          <p class="text-gray-600">We offer a 30-day return policy for all products. Items must be in original condition
+            with all packaging.</p>
+        </div>
+        <div class="faq-item bg-white p-6 rounded-lg shadow-md" data-framer-motion="slideIn" data-framer-delay="0.4">
+          <h3 class="text-xl font-semibold mb-2">Do you offer international shipping?</h3>
+          <p class="text-gray-600">Yes, we ship worldwide. Shipping costs and delivery times vary by location.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section id="contact" class="mb-12">
+      <h2 class="text-3xl font-bold mb-8">Contact Us</h2>
+      <form class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700 mb-2">Name</label>
+            <input type="text"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300">
+          </div>
+          <div>
+            <label class="block text-gray-700 mb-2">Email</label>
+            <input type="email"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300">
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">Subject</label>
+          <input type="text"
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300">
+        </div>
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">Message</label>
+          <textarea rows="4"
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300"></textarea>
+        </div>
+        <button type="submit" class="bg-gray-800 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+          Send Message
+        </button>
+      </form>
+    </section>
+
+    <!-- Shipping Information -->
+    <section id="shipping" class="mb-12">
+      <h2 class="text-3xl font-bold mb-8">Shipping Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md" data-framer-motion="fadeIn">
+          <h3 class="text-xl font-semibold mb-2">Standard Shipping</h3>
+          <p class="text-gray-600">3-5 business days</p>
+          <p class="text-gray-600">Free on orders over $50</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md" data-framer-motion="fadeIn" data-framer-delay="0.2">
+          <h3 class="text-xl font-semibold mb-2">Express Shipping</h3>
+          <p class="text-gray-600">1-2 business days</p>
+          <p class="text-gray-600">$15.99</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md" data-framer-motion="fadeIn" data-framer-delay="0.4">
+          <h3 class="text-xl font-semibold mb-2">International Shipping</h3>
+          <p class="text-gray-600">5-10 business days</p>
+          <p class="text-gray-600">Rates vary by location</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-4">TechStore</h3>
+          <p class="text-gray-400">Your destination for cutting-edge technology and innovation.</p>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="/products" class="text-gray-400 hover:text-white">Products</a></li>
+            <li><a href="/support" class="text-gray-400 hover:text-white">Support</a></li>
+            <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="/faq" class="text-gray-400 hover:text-white">FAQ</a></li>
+            <li><a href="/shipping" class="text-gray-400 hover:text-white">Shipping</a></li>
+            <li><a href="/returns" class="text-gray-400 hover:text-white">Returns</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Contact</h4>
+          <ul class="space-y-2">
+            <li class="text-gray-400">Email: support@techstore.com</li>
+            <li class="text-gray-400">Phone: (123) 456-7890</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2024 TechStore. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+
+</html>

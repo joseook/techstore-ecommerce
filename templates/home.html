@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.title}} - TechStore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="/static/css/main.css" rel="stylesheet">
+  <link href="/static/css/navbar.css" rel="stylesheet">
+  <link href="/static/css/home.css" rel="stylesheet">
+  <link href="/static/css/components.css" rel="stylesheet">
+  <style>
+    /* Hero Section */
+    .hero-fullscreen {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: #000;
+    }
+
+    .hero-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+    }
+
+    .hero-content {
+      z-index: 1;
+      padding: 2rem;
+      max-width: 800px;
+    }
+
+    .hero-title {
+      font-size: 5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    /* Featured Product */
+    .featured-product {
+      padding: 0;
+      overflow: hidden;
+      background: #f5f5f7;
+    }
+
+    .featured-product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .featured-product-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem;
+    }
+
+    .content-inner {
+      max-width: 500px;
+    }
+
+    .eyebrow {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6e6e73;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* Product Grid */
+    .product-tile {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    .product-tile img {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      max-height: 70%;
+      max-width: 100%;
+      transition: transform 0.5s ease;
+    }
+
+    .product-tile:hover img {
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    .product-tile-content {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* Features */
+    .why-techstore {
+      padding: 6rem 0;
+    }
+
+    .feature-card {
+      padding: 2rem;
+      height: 100%;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: #1d1d1f;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 6rem 0;
+    }
+
+    .testimonial-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .testimonial-text {
+      font-size: 1.5rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    .testimonial-author {
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: #6e6e73;
+    }
+
+    /* Call to Action */
+    .cta {
+      padding: 6rem 0;
+      background: #f5f5f7;
+    }
+
+    /* Animation */
+    .reveal-animation {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal-animation.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: 3.5rem;
+      }
+
+      .featured-product-content {
+        padding: 3rem;
+      }
+
+      .product-tile {
+        height: 400px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .product-tile {
+        height: 350px;
+      }
+
+      .testimonial-text {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">TechStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Home"}}active{{end}}" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Our Products"}}active{{end}}" href="/products">Products</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Categories
+            </a>
+            <ul class="dropdown-menu" id="categories-dropdown-menu" aria-labelledby="categoriesDropdown">
+              <li><a class="dropdown-item" href="/products">All Categories</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <!-- Categories will be loaded dynamically -->
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Support"}}active{{end}}" href="/support">Support</a>
+          </li>
+        </ul>
+
+        <!-- Search Form -->
+        <form class="d-flex search-form mx-auto" action="/products" method="GET">
+          <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+          <input class="form-control" type="search" name="search" placeholder="Search products..." aria-label="Search">
+        </form>
+
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link cart-icon" href="/cart">
+              <i class="bi bi-cart-fill"></i>
+              <span class="badge bg-primary" id="cart-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero Section (Fullscreen) -->
+    <section class="hero-fullscreen">
+      <div class="hero-content text-center">
+        <h1 class="hero-title">TechStore</h1>
+        <p class="hero-subtitle">Innovation at your fingertips</p>
+        <a href="/products" class="btn btn-lg btn-outline-light rounded-pill px-4 mt-3">Explore</a>
+      </div>
+      <div class="hero-background">
+        <video autoplay muted loop class="hero-video">
+          <source
+            src="https://www.apple.com/105/media/us/iphone-14-pro/2023/b094f6e4-dcdb-494f-bd72-45d659f4ad7e/films/product-tour/iphone-14-pro-product-tour-tpl-us-2023_16x9.mp4"
+            type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+    <!-- Featured Product (Full Width) -->
+    <section class="featured-product">
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <div class="col-lg-6 featured-product-image">
+            <img src="https://img.freepik.com/free-psd/premium-mobile-phone-screen-mockup-template_53876-65749.jpg"
+              alt="Latest Smartphone">
+          </div>
+          <div class="col-lg-6 featured-product-content">
+            <div class="content-inner">
+              <span class="eyebrow">New</span>
+              <h2 class="display-3">TechPhone Pro</h2>
+              <p class="lead">The most powerful smartphone we've ever built.</p>
+              <div class="d-flex gap-3 mt-4">
+                <a href="/product/1" class="btn btn-dark rounded-pill px-4">Learn more</a>
+                <a href="/products" class="btn btn-outline-dark rounded-pill px-4">Buy</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Grid (Three Up) -->
+    <section class="product-grid">
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <div class="col-md-4 product-tile">
+            <div class="product-tile-content">
+              <span class="eyebrow">Lightweight</span>
+              <h3>TechBook Air</h3>
+              <p>Incredibly light. Impossibly powerful.</p>
+              <div class="mt-auto">
+                <a href="/products?category=laptops" class="link-dark">Shop now <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+            <img src="https://img.freepik.com/free-psd/laptop-mock-up-isolated_1310-1458.jpg" alt="TechBook Air">
+          </div>
+          <div class="col-md-4 product-tile">
+            <div class="product-tile-content">
+              <span class="eyebrow">Immersive</span>
+              <h3>TechPods Pro</h3>
+              <p>Remarkable sound. All-day comfort.</p>
+              <div class="mt-auto">
+                <a href="/products?category=audio" class="link-dark">Shop now <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+            <img src="https://img.freepik.com/free-psd/earphones-mockup_1310-657.jpg" alt="TechPods Pro">
+          </div>
+          <div class="col-md-4 product-tile">
+            <div class="product-tile-content">
+              <span class="eyebrow">Revolutionary</span>
+              <h3>TechWatch</h3>
+              <p>A healthy leap ahead.</p>
+              <div class="mt-auto">
+                <a href="/products?category=wearables" class="link-dark">Shop now <i class="bi bi-arrow-right"></i></a>
+              </div>
+            </div>
+            <img src="https://img.freepik.com/free-psd/smartwatch-mock-up_1310-264.jpg" alt="TechWatch">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why TechStore Section -->
+    <section class="why-techstore">
+      <div class="container">
+        <div class="section-title text-center">
+          <h2>Why TechStore</h2>
+        </div>
+        <div class="row g-4 mt-3">
+          <div class="col-md-4">
+            <div class="feature-card text-center">
+              <div class="feature-icon">
+                <i class="bi bi-award"></i>
+              </div>
+              <h3>Quality Guaranteed</h3>
+              <p>All products are rigorously tested and come with a 2-year warranty.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card text-center">
+              <div class="feature-icon">
+                <i class="bi bi-truck"></i>
+              </div>
+              <h3>Fast Delivery</h3>
+              <p>Free express shipping on all orders over $100.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card text-center">
+              <div class="feature-icon">
+                <i class="bi bi-headset"></i>
+              </div>
+              <h3>Expert Support</h3>
+              <p>Our tech specialists are available 24/7 to assist you.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Carousel -->
+    <section class="testimonials bg-light">
+      <div class="container">
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="testimonial-content text-center">
+                <p class="testimonial-text">"The best tech buying experience I've ever had. The products are premium
+                  quality
+                  and the customer service is exceptional."</p>
+                <p class="testimonial-author">- Sarah Johnson</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <div class="testimonial-content text-center">
+                <p class="testimonial-text">"TechStore has become my go-to place for all my tech needs. Fast shipping
+                  and
+                  great prices!"</p>
+                <p class="testimonial-author">- Michael Chen</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <div class="testimonial-content text-center">
+                <p class="testimonial-text">"Absolutely love my new TechPhone Pro. The camera quality is incredible and
+                  the
+                  battery lasts all day."</p>
+                <p class="testimonial-author">- Emma Rodriguez</p>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+      <div class="container text-center">
+        <h2>Ready to upgrade your tech?</h2>
+        <p class="lead mb-4">Explore our collection of premium devices and accessories.</p>
+        <a href="/products" class="btn btn-lg btn-dark rounded-pill px-5">Shop Now</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-dark text-white py-4 mt-0">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h5 class="mb-3">TechStore</h5>
+          <p class="mb-0">Your one-stop shop for cutting-edge technology and innovation.</p>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h6 class="mb-3">Shop</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="/products" class="text-white text-decoration-none">All Products</a></li>
+            <li><a href="/products?new=true" class="text-white text-decoration-none">New Arrivals</a></li>
+            <li><a href="/products?popular=true" class="text-white text-decoration-none">Popular Items</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h6 class="mb-3">Support</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="/support" class="text-white text-decoration-none">Help Center</a></li>
+            <li><a href="/support" class="text-white text-decoration-none">FAQs</a></li>
+            <li><a href="/support" class="text-white text-decoration-none">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6 class="mb-3">Stay Connected</h6>
+          <div class="d-flex mb-3">
+            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-5"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
+            <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+          </div>
+          <p class="mb-0">© 2024 TechStore. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <script>
+    // Load categories for dropdown
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        const response = await fetch('/api/categories');
+        const categories = await response.json();
+        const categoriesMenu = document.getElementById('categories-dropdown-menu');
+
+        categories.forEach(category => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.className = 'dropdown-item';
+          a.href = `/products?category=${encodeURIComponent(category)}`;
+          a.textContent = category;
+          li.appendChild(a);
+          categoriesMenu.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      // Intersection Observer for reveal animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.product-tile, .feature-card, .testimonial-content, .cta').forEach(el => {
+        el.classList.add('reveal-animation');
+        observer.observe(el);
+      });
+    });
+  </script>
+</body>
+
+</html>

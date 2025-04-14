@@ -1,0 +1,218 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container py-5">
+  {{if .Product}}
+  <div class="row">
+    <div class="col-md-6">
+      <img src="{{if .Product.ImageURL}}{{.Product.ImageURL}}{{else}}{{.Product.Image}}{{end}}"
+        class="img-fluid rounded shadow-lg" alt="{{.Product.Name}}">
+    </div>
+    <div class="col-md-6">
+      <h1 class="mb-3">{{.Product.Name}}</h1>
+      <p class="text-muted mb-4">{{.Product.Description}}</p>
+      <div class="d-flex align-items-center mb-4">
+        <h3 class="mb-0">${{.Product.Price}}</h3>
+        <span class="badge bg-success ms-3">In Stock</span>
+      </div>
+
+      <!-- Product Category -->
+      <div class="mb-4">
+        <span class="badge bg-primary">{{.Product.Category}}</span>
+        {{if .Product.IsNew}}
+        <span class="badge bg-info ms-2">New</span>
+        {{end}}
+        {{if .Product.IsPopular}}
+        <span class="badge bg-warning ms-2">Popular</span>
+        {{end}}
+      </div>
+
+      <div class="d-flex align-items-center mb-4">
+        <div class="input-group" style="width: 150px;">
+          <button class="btn btn-outline-secondary" type="button"
+            onclick="updateQuantity('{{.Product.ID}}', -1)">-</button>
+          <input type="text" class="form-control text-center" value="1" id="quantity-{{.Product.ID}}" readonly>
+          <button class="btn btn-outline-secondary" type="button"
+            onclick="updateQuantity('{{.Product.ID}}', 1)">+</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg w-100 mb-3" onclick="addToCart('{{.Product.ID}}')">
+        <i class="bi bi-cart-plus me-2"></i>Add to Cart
+      </button>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary flex-grow-1">
+          <i class="bi bi-heart me-2"></i>Add to Wishlist
+        </button>
+        <button class="btn btn-outline-secondary flex-grow-1">
+          <i class="bi bi-share me-2"></i>Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Specifications -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <h3 class="mb-4">Product Specifications</h3>
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>Product ID:</strong> <span>{{.Product.ID}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>Category:</strong> <span>{{.Product.Category}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>Price:</strong> <span>${{.Product.Price}}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>Status:</strong> <span class="text-success">In Stock</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>New Product:</strong> <span>{{if .Product.IsNew}}Yes{{else}}No{{end}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong>Popular Product:</strong> <span>{{if .Product.IsPopular}}Yes{{else}}No{{end}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Reviews -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <h3 class="mb-4">Customer Reviews</h3>
+      {{range .reviews}}
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="flex-shrink-0">
+              <img src="https://via.placeholder.com/50" alt="User" class="rounded-circle">
+            </div>
+            <div class="ms-3">
+              <h5 class="mb-1">{{.User}}</h5>
+              <div class="text-warning mb-2">
+                {{$rating := .Rating}}
+                {{range $i := iterate 5}}
+                {{if lt $i $rating}}
+                <i class="bi bi-star-fill"></i>
+                {{else}}
+                <i class="bi bi-star"></i>
+                {{end}}
+                {{end}}
+              </div>
+              <p class="mb-1">{{.Comment}}</p>
+              <small class="text-muted">{{.Date}}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="alert alert-info">No reviews yet for this product.</div>
+      {{end}}
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <h3 class="mb-4">Related Products</h3>
+      <div class="row">
+        {{range .relatedProducts}}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <img src="{{if .ImageURL}}{{.ImageURL}}{{else}}{{.Image}}{{end}}" class="card-img-top" alt="{{.Name}}">
+            <div class="card-body">
+              <h5 class="card-title">{{.Name}}</h5>
+              <p class="card-text text-truncate">{{.Description}}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="h5 mb-0">${{.Price}}</span>
+                <a href="/product/{{.ID}}" class="btn btn-primary">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{else}}
+        <div class="col-12">
+          <div class="alert alert-info">No related products found.</div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="alert alert-danger">
+    <h4>Produto não encontrado</h4>
+    <p>Debug info:</p>
+    <ul>
+      <li>Requested product ID: {{.productID}}</li>
+      <li>Error message: {{.error}}</li>
+    </ul>
+  </div>
+  {{end}}
+</div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Notification</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body"></div>
+  </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+  function updateQuantity(productId, change) {
+    const input = document.getElementById(`quantity-${productId}`);
+    const newValue = parseInt(input.value) + change;
+    if (newValue > 0) {
+      input.value = newValue;
+    }
+  }
+
+  function addToCart(productId) {
+    const quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+
+    fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product: { id: productId },
+        quantity: quantity
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        showToast('Product added to cart!');
+        updateCartCount();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Error adding product to cart');
+      });
+  }
+
+  function showToast(message) {
+    const toast = new bootstrap.Toast(document.getElementById('toast'));
+    document.querySelector('.toast-body').textContent = message;
+    toast.show();
+  }
+</script>
+{{end}}

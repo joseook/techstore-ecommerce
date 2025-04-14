@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.title}} - TechStore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="/static/css/main.css" rel="stylesheet">
+  <link href="/static/css/navbar.css" rel="stylesheet">
+  <link href="/static/css/home.css" rel="stylesheet">
+  <link href="/static/css/components.css" rel="stylesheet">
+  <style>
+    /* Page Header */
+    .page-header {
+      padding: 5rem 0;
+      background-color: #f8f9fa;
+    }
+
+    /* Filters Section */
+    .filters-section {
+      background-color: #fff;
+    }
+
+    /* Featured Product */
+    .featured-product {
+      overflow: hidden;
+    }
+
+    .featured-product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .featured-product-image:hover img {
+      transform: scale(1.05);
+    }
+
+    .featured-product-content {
+      display: flex;
+      align-items: center;
+      padding: 3rem;
+    }
+
+    .content-inner {
+      max-width: 500px;
+    }
+
+    .eyebrow {
+      display: block;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      color: #6c757d;
+    }
+
+    /* Product Grid */
+    .product-card {
+      position: relative;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      background-color: #fff;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-item {
+      display: block !important;
+      /* Garantir que os itens são sempre visíveis */
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-image {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 250px;
+      object-fit: contain;
+      transition: transform 0.5s ease;
+      background-color: #f8f9fa;
+    }
+
+    .product-card:hover .product-image img {
+      transform: scale(1.05);
+    }
+
+    .product-actions {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-actions {
+      opacity: 1;
+    }
+
+    .action-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background-color: #fff;
+      color: #333;
+      margin: 0 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-button:hover {
+      background-color: #000;
+      color: #fff;
+    }
+
+    .product-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .product-title a {
+      color: #212529;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .product-title a:hover {
+      color: #007bff;
+    }
+
+    .product-price {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .product-rating {
+      color: #ffc107;
+      font-size: 0.8rem;
+    }
+
+    .rating-count {
+      color: #6c757d;
+      font-size: 0.8rem;
+      margin-left: 2px;
+    }
+
+    /* List View */
+    .list-view .product-item {
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+      display: block !important;
+    }
+
+    .list-view .product-card {
+      flex-direction: row;
+    }
+
+    .list-view .product-image {
+      width: 300px;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .list-view .product-image img {
+      height: 100%;
+    }
+
+    .list-view .product-info {
+      width: calc(100% - 300px);
+      padding: 1.5rem;
+    }
+
+    .list-view .product-description {
+      display: block !important;
+      margin-top: 1rem;
+    }
+
+    /* Category Cards */
+    .category-card {
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      height: 100%;
+    }
+
+    .category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-icon {
+      font-size: 2.5rem;
+      color: #007bff;
+      margin-bottom: 1.5rem;
+    }
+
+    .category-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .category-card p {
+      color: #6c757d;
+      margin-bottom: 0;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 15px 25px;
+      background-color: #fff;
+      color: #333;
+      border-radius: 5px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .toast-notification.success {
+      border-left: 4px solid #28a745;
+    }
+
+    .toast-notification.error {
+      border-left: 4px solid #dc3545;
+    }
+
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Media queries */
+    @media (max-width: 991px) {
+      .featured-product-content {
+        padding: 2rem;
+      }
+
+      .list-view .product-image {
+        width: 200px;
+      }
+
+      .list-view .product-info {
+        width: calc(100% - 200px);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .page-header {
+        padding: 3rem 0;
+      }
+
+      .list-view .product-card {
+        flex-direction: column;
+      }
+
+      .list-view .product-image {
+        width: 100%;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .list-view .product-info {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">TechStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Home"}}active{{end}}" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Our Products"}}active{{end}}" href="/products">Products</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Categories
+            </a>
+            <ul class="dropdown-menu" id="categories-dropdown-menu" aria-labelledby="categoriesDropdown">
+              <li><a class="dropdown-item" href="/products">All Categories</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <!-- Categories will be loaded dynamically -->
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{if eq .title " Support"}}active{{end}}" href="/support">Support</a>
+          </li>
+        </ul>
+
+        <!-- Search Form -->
+        <form class="d-flex search-form mx-auto" action="/products" method="GET">
+          <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+          <input class="form-control" type="search" name="search" placeholder="Search products..." aria-label="Search">
+        </form>
+
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link cart-icon" href="/cart">
+              <i class="bi bi-cart-fill"></i>
+              <span class="badge bg-primary" id="cart-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Page Header -->
+    <section class="page-header bg-light">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4">Our Products</h1>
+            <p class="lead">Discover our collection of premium tech products</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters and Sort -->
+    <section class="filters-section py-4 border-bottom">
+      <div class="container">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-3">
+            <select class="form-select" id="categoryFilter">
+              <option value="">All Categories</option>
+              <!-- Categories will be loaded dynamically -->
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="brandFilter">
+              <option value="">All Brands</option>
+              <!-- Brands will be loaded dynamically -->
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="sortOption">
+              <option value="popular">Most Popular</option>
+              <option value="newest">Newest First</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Search products..." id="searchInput">
+              <button class="btn btn-dark" type="button" id="searchButton">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Product -->
+    <section class="featured-product my-5">
+      <div class="container">
+        <div class="row g-0 border rounded shadow-sm overflow-hidden">
+          <div class="col-lg-6 featured-product-image">
+            <img src="https://img.freepik.com/free-psd/premium-mobile-phone-screen-mockup-template_53876-65749.jpg"
+              alt="Featured Product">
+          </div>
+          <div class="col-lg-6 featured-product-content">
+            <div class="content-inner">
+              <span class="eyebrow">Featured</span>
+              <h2 class="display-4">Premium Headphones</h2>
+              <p class="lead mb-4">Experience incredible sound quality with our latest noise-cancelling headphones.</p>
+              <div class="d-flex align-items-center mb-4">
+                <span class="h4 mb-0 me-3">$199.99</span>
+                <span class="badge bg-success">20% OFF</span>
+              </div>
+              <div class="d-flex gap-3">
+                <a href="/product/1" class="btn btn-dark rounded-pill px-4">View Details</a>
+                <button onclick="addToCart('1')" class="btn btn-outline-dark rounded-pill px-4">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="products-grid">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="h3 mb-0">All Products</h2>
+          <div class="view-options">
+            <button type="button" class="btn btn-sm btn-outline-dark me-2 active" id="gridView">
+              <i class="bi bi-grid"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-dark" id="listView">
+              <i class="bi bi-list"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Products Grid View -->
+        <div class="row g-4" id="productsContainer">
+          <!-- Loading indicator -->
+          <div class="col-12 text-center py-5" id="loadingIndicator">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading products...</p>
+          </div>
+
+          <!-- Static product items will be here but will be replaced by JavaScript -->
+          {{range .products}}
+          <div class="col-md-6 col-lg-4 col-xl-3 product-item" data-category="{{.Category}}" data-price="{{.Price}}"
+            data-id="{{.ID}}">
+            <div class="product-card h-100">
+              <div class="product-image">
+                <img src="{{if .ImageURL}}{{.ImageURL}}{{else}}{{.Image}}{{end}}" alt="{{.Name}}" class="img-fluid">
+                <div class="product-actions">
+                  <button class="action-button quick-view" data-id="{{.ID}}">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="action-button add-to-wishlist" data-id="{{.ID}}">
+                    <i class="bi bi-heart"></i>
+                  </button>
+                  <button class="action-button add-to-cart" onclick="addToCart('{{.ID}}')">
+                    <i class="bi bi-cart-plus"></i>
+                  </button>
+                </div>
+                {{if .IsNew}}<span class="badge bg-success position-absolute top-0 start-0 m-3">New</span>{{end}}
+                {{if .IsPopular}}<span class="badge bg-primary position-absolute top-0 end-0 m-3">Popular</span>{{end}}
+              </div>
+              <div class="product-info p-3">
+                <h3 class="product-title">
+                  <a href="/product/{{.ID}}">{{.Name}}</a>
+                </h3>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="product-price">${{.Price}}</span>
+                  <div class="product-rating">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                    <span class="rating-count">(24)</span>
+                  </div>
+                </div>
+                <p class="product-description d-none">{{.Description}}</p>
+              </div>
+            </div>
+          </div>
+          {{end}}
+        </div>
+
+        <!-- Pagination -->
+        <nav class="my-5">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Trending Categories -->
+    <section class="categories-section bg-light py-5">
+      <div class="container">
+        <div class="section-title text-center mb-5">
+          <h2>Shop by Category</h2>
+          <p>Browse our most popular categories</p>
+        </div>
+        <div class="row g-4" id="categoriesContainer">
+          <!-- Categories will be loaded dynamically by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Quick View Modal -->
+    <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="quickViewTitle">Product Quick View</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <img src="" alt="Product image" id="quickViewImage" class="img-fluid">
+              </div>
+              <div class="col-md-6">
+                <h2 id="quickViewName"></h2>
+                <p class="h4 mb-4" id="quickViewPrice"></p>
+                <p id="quickViewDescription"></p>
+                <div class="d-flex align-items-center mb-4">
+                  <div class="input-group me-3" style="width: 130px;">
+                    <button class="btn btn-outline-dark" type="button" id="decreaseQuantity">-</button>
+                    <input type="text" class="form-control text-center" value="1" id="quantityInput">
+                    <button class="btn btn-outline-dark" type="button" id="increaseQuantity">+</button>
+                  </div>
+                  <button class="btn btn-dark rounded-pill px-4" id="modalAddToCart">Add to Cart</button>
+                </div>
+                <div class="mb-3">
+                  <span class="me-2">Category:</span>
+                  <span class="text-muted" id="quickViewCategory"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-white py-4 mt-0">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4 mb-md-0">
+          <h5 class="mb-3">TechStore</h5>
+          <p class="mb-0">Your one-stop shop for cutting-edge technology and innovation.</p>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h6 class="mb-3">Shop</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="/products" class="text-white text-decoration-none">All Products</a></li>
+            <li><a href="/products?new=true" class="text-white text-decoration-none">New Arrivals</a></li>
+            <li><a href="/products?popular=true" class="text-white text-decoration-none">Popular Items</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2 mb-4 mb-md-0">
+          <h6 class="mb-3">Support</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="/support" class="text-white text-decoration-none">Help Center</a></li>
+            <li><a href="/support" class="text-white text-decoration-none">FAQs</a></li>
+            <li><a href="/support" class="text-white text-decoration-none">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6 class="mb-3">Stay Connected</h6>
+          <div class="d-flex mb-3">
+            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-5"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
+            <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+          </div>
+          <p class="mb-0">© 2024 TechStore. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <script>
+    // Versão debug para tratar problemas de carregamento de produtos
+    console.log("Carregando script de products.html...");
+
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log("DOM carregado em products.html");
+
+      // Verificar se o container de produtos existe
+      const productsContainer = document.getElementById('productsContainer');
+      if (productsContainer) {
+        console.log("Container de produtos encontrado");
+      } else {
+        console.error("Container de produtos NÃO encontrado!");
+      }
+
+      // Forçar que todos os cards de produtos sejam visíveis
+      document.querySelectorAll('.product-card').forEach(card => {
+        card.classList.add('visible');
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      });
+
+      // Garantir que todos os product-item são visíveis
+      document.querySelectorAll('.product-item').forEach(item => {
+        item.style.display = 'block';
+        item.style.opacity = '1';
+        item.style.visibility = 'visible';
+      });
+
+      // Checar elementos do DOM na página
+      console.log("Verificando elementos da página:", {
+        categoryFilter: !!document.getElementById('categoryFilter'),
+        brandFilter: !!document.getElementById('brandFilter'),
+        searchInput: !!document.getElementById('searchInput'),
+        gridView: !!document.getElementById('gridView'),
+        listView: !!document.getElementById('listView')
+      });
+
+      // Verificar se os produtos diretos do template aparecem
+      const templateProducts = document.querySelectorAll('.product-item');
+      console.log(`Produtos carregados do template: ${templateProducts.length}`);
+
+      loadCategoriesAndBrands();
+
+      // Grid/List view toggling
+      const gridViewBtn = document.getElementById('gridView');
+      const listViewBtn = document.getElementById('listView');
+
+      if (gridViewBtn && listViewBtn) {
+        gridViewBtn.addEventListener('click', function () {
+          productsContainer.classList.remove('list-view');
+          gridViewBtn.classList.add('active');
+          listViewBtn.classList.remove('active');
+          console.log("View changed to grid");
+        });
+
+        listViewBtn.addEventListener('click', function () {
+          productsContainer.classList.add('list-view');
+          listViewBtn.classList.add('active');
+          gridViewBtn.classList.remove('active');
+          console.log("View changed to list");
+        });
+      }
+    });
+
+    function loadCategoriesAndBrands() {
+      // Load categories for dropdown and category cards
+      try {
+        // Load categories
+        fetch('/api/categories')
+          .then(response => response.json())
+          .then(categories => {
+            console.log("Categorias carregadas:", categories);
+
+            // Update dropdown menu
+            const categoriesMenu = document.getElementById('categories-dropdown-menu');
+            if (categoriesMenu) {
+              categories.forEach(category => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.className = 'dropdown-item';
+                a.href = `/products?category=${encodeURIComponent(category)}`;
+                a.textContent = category;
+                li.appendChild(a);
+                categoriesMenu.appendChild(li);
+              });
+            }
+
+            // Update category filter
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+              // Keep the "All Categories" option and add the rest
+              categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categoryFilter.appendChild(option);
+              });
+            }
+
+            // Update category cards
+            const categoriesContainer = document.getElementById('categoriesContainer');
+            if (categoriesContainer) {
+              // Clear existing content
+              categoriesContainer.innerHTML = '';
+
+              // Map category names to icons and product counts
+              const categoryIcons = {
+                'smartphones': 'bi-phone',
+                'laptops': 'bi-laptop',
+                'tablets': 'bi-tablet',
+                'wearables': 'bi-smartwatch',
+                'audio': 'bi-headphones',
+                'accessories': 'bi-usb-plug',
+                'gaming': 'bi-controller',
+                'televisions': 'bi-tv',
+                'cameras': 'bi-camera'
+              };
+
+              // Add category cards
+              categories.forEach(category => {
+                const icon = categoryIcons[category.toLowerCase()] || 'bi-box';
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-3';
+                col.innerHTML = `
+                  <div class="category-card text-center">
+                    <div class="category-icon">
+                      <i class="bi ${icon}"></i>
+                    </div>
+                    <h3>${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                    <p>${Math.floor(Math.random() * 20) + 5} products</p>
+                    <a href="/products?category=${encodeURIComponent(category)}" class="stretched-link"></a>
+                  </div>
+                `;
+                categoriesContainer.appendChild(col);
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error loading categories:', error);
+          });
+
+        // Load brands
+        fetch('/api/brands')
+          .then(response => response.json())
+          .then(brands => {
+            console.log("Marcas carregadas:", brands);
+
+            // Update brand filter
+            const brandFilter = document.getElementById('brandFilter');
+            if (brandFilter) {
+              // Keep the "All Brands" option and add the rest
+              brands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand;
+                option.textContent = brand;
+                brandFilter.appendChild(option);
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error loading brands:', error);
+          });
+      } catch (error) {
+        console.error('Error in loading categories and brands:', error);
+      }
+    }
+  </script>
+</body>
+
+</html>

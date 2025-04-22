@@ -1,218 +1,744 @@
-{{template "base.html" .}}
+<!DOCTYPE html>
+<html lang="en">
 
-{{define "content"}}
-<div class="container py-5">
-  {{if .Product}}
-  <div class="row">
-    <div class="col-md-6">
-      <img src="{{if .Product.ImageURL}}{{.Product.ImageURL}}{{else}}{{.Product.Image}}{{end}}"
-        class="img-fluid rounded shadow-lg" alt="{{.Product.Name}}">
-    </div>
-    <div class="col-md-6">
-      <h1 class="mb-3">{{.Product.Name}}</h1>
-      <p class="text-muted mb-4">{{.Product.Description}}</p>
-      <div class="d-flex align-items-center mb-4">
-        <h3 class="mb-0">${{.Product.Price}}</h3>
-        <span class="badge bg-success ms-3">In Stock</span>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.title}} - TechStore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="/static/css/main.css" rel="stylesheet">
+  <link href="/static/css/navbar.css" rel="stylesheet">
+  <link href="/static/css/home.css" rel="stylesheet">
+  <link href="/static/css/components.css" rel="stylesheet">
+</head>
 
-      <!-- Product Category -->
-      <div class="mb-4">
-        <span class="badge bg-primary">{{.Product.Category}}</span>
-        {{if .Product.IsNew}}
-        <span class="badge bg-info ms-2">New</span>
-        {{end}}
-        {{if .Product.IsPopular}}
-        <span class="badge bg-warning ms-2">Popular</span>
-        {{end}}
-      </div>
-
-      <div class="d-flex align-items-center mb-4">
-        <div class="input-group" style="width: 150px;">
-          <button class="btn btn-outline-secondary" type="button"
-            onclick="updateQuantity('{{.Product.ID}}', -1)">-</button>
-          <input type="text" class="form-control text-center" value="1" id="quantity-{{.Product.ID}}" readonly>
-          <button class="btn btn-outline-secondary" type="button"
-            onclick="updateQuantity('{{.Product.ID}}', 1)">+</button>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-lg w-100 mb-3" onclick="addToCart('{{.Product.ID}}')">
-        <i class="bi bi-cart-plus me-2"></i>Add to Cart
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">TechStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary flex-grow-1">
-          <i class="bi bi-heart me-2"></i>Add to Wishlist
-        </button>
-        <button class="btn btn-outline-secondary flex-grow-1">
-          <i class="bi bi-share me-2"></i>Share
-        </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/products">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/support">Support</a>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <div class="input-group">
+            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-light" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">
+              <i class="bi bi-cart3"></i>
+              <span class="badge bg-danger rounded-pill cart-count">0</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="bi bi-person"></i>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- Product Specifications -->
-  <div class="row mt-5">
-    <div class="col-12">
-      <h3 class="mb-4">Product Specifications</h3>
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>Product ID:</strong> <span>{{.Product.ID}}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>Category:</strong> <span>{{.Product.Category}}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>Price:</strong> <span>${{.Product.Price}}</span>
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>Status:</strong> <span class="text-success">In Stock</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>New Product:</strong> <span>{{if .Product.IsNew}}Yes{{else}}No{{end}}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <strong>Popular Product:</strong> <span>{{if .Product.IsPopular}}Yes{{else}}No{{end}}</span>
-                </li>
-              </ul>
+  <!-- Main Content -->
+  <div class="container py-5">
+    {{if .Product}}
+    <div class="row">
+      <div class="col-md-6">
+        <img src="{{if .Product.ImageURL}}{{.Product.ImageURL}}{{else}}{{.Product.Image}}{{end}}"
+          class="img-fluid rounded shadow-lg" alt="{{.Product.Name}}">
+      </div>
+      <div class="col-md-6">
+        <h1 class="mb-3">{{.Product.Name}}</h1>
+        <p class="text-muted mb-4">{{.Product.Description}}</p>
+        <div class="d-flex align-items-center mb-4">
+          <h3 class="mb-0">${{.Product.Price}}</h3>
+          <span class="badge bg-success ms-3">In Stock</span>
+        </div>
+
+        <!-- Product Category -->
+        <div class="mb-4">
+          <span class="badge bg-primary">{{.Product.Category}}</span>
+          {{if .Product.IsNew}}
+          <span class="badge bg-info ms-2">New</span>
+          {{end}}
+          {{if .Product.IsPopular}}
+          <span class="badge bg-warning ms-2">Popular</span>
+          {{end}}
+        </div>
+
+        <div class="d-flex align-items-center mb-4">
+          <div class="input-group" style="width: 150px;">
+            <button class="btn btn-outline-secondary" type="button"
+              onclick="updateQuantity('{{.Product.ID}}', -1)">-</button>
+            <input type="text" class="form-control text-center" value="1" id="quantity-{{.Product.ID}}" readonly>
+            <button class="btn btn-outline-secondary" type="button"
+              onclick="updateQuantity('{{.Product.ID}}', 1)">+</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg w-100 mb-3" onclick="addToCart('{{.Product.ID}}')">
+          <i class="bi bi-cart-plus me-2"></i>Add to Cart
+        </button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary flex-grow-1">
+            <i class="bi bi-heart me-2"></i>Add to Wishlist
+          </button>
+          <button class="btn btn-outline-secondary flex-grow-1">
+            <i class="bi bi-share me-2"></i>Share
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Specifications -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="mb-4">Product Specifications</h3>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>Product ID:</strong> <span>{{.Product.ID}}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>Category:</strong> <span>{{.Product.Category}}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>Price:</strong> <span>${{.Product.Price}}</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>Status:</strong> <span class="text-success">In Stock</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>New Product:</strong> <span>{{if .Product.IsNew}}Yes{{else}}No{{end}}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <strong>Popular Product:</strong> <span>{{if .Product.IsPopular}}Yes{{else}}No{{end}}</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Customer Reviews -->
-  <div class="row mt-5">
-    <div class="col-12">
-      <h3 class="mb-4">Customer Reviews</h3>
-      {{range .reviews}}
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="d-flex">
-            <div class="flex-shrink-0">
-              <img src="https://via.placeholder.com/50" alt="User" class="rounded-circle">
+    <!-- Customer Reviews -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="mb-4">Customer Reviews</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <span class="display-4 fw-bold">4.5</span>
             </div>
-            <div class="ms-3">
-              <h5 class="mb-1">{{.User}}</h5>
-              <div class="text-warning mb-2">
-                {{$rating := .Rating}}
-                {{range $i := iterate 5}}
-                {{if lt $i $rating}}
+            <div>
+              <div class="text-warning mb-1">
                 <i class="bi bi-star-fill"></i>
-                {{else}}
-                <i class="bi bi-star"></i>
-                {{end}}
-                {{end}}
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
               </div>
-              <p class="mb-1">{{.Comment}}</p>
-              <small class="text-muted">{{.Date}}</small>
+              <p class="mb-0 text-muted">Based on {{len .reviews}} reviews</p>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+            <i class="bi bi-pencil-square me-2"></i>Write a Review
+          </button>
+        </div>
+
+        <!-- Review summary bars -->
+        <div class="review-summary mb-4">
+          <div class="row align-items-center mb-2">
+            <div class="col-2 col-md-1">5 <i class="bi bi-star-fill text-warning"></i></div>
+            <div class="col-8 col-md-10">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 70%;" aria-valuenow="70"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-end">70%</div>
+          </div>
+          <div class="row align-items-center mb-2">
+            <div class="col-2 col-md-1">4 <i class="bi bi-star-fill text-warning"></i></div>
+            <div class="col-8 col-md-10">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 20%;" aria-valuenow="20"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-end">20%</div>
+          </div>
+          <div class="row align-items-center mb-2">
+            <div class="col-2 col-md-1">3 <i class="bi bi-star-fill text-warning"></i></div>
+            <div class="col-8 col-md-10">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 5%;" aria-valuenow="5"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-end">5%</div>
+          </div>
+          <div class="row align-items-center mb-2">
+            <div class="col-2 col-md-1">2 <i class="bi bi-star-fill text-warning"></i></div>
+            <div class="col-8 col-md-10">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 3%;" aria-valuenow="3"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-end">3%</div>
+          </div>
+          <div class="row align-items-center mb-2">
+            <div class="col-2 col-md-1">1 <i class="bi bi-star-fill text-warning"></i></div>
+            <div class="col-8 col-md-10">
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 2%;" aria-valuenow="2"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="col-2 col-md-1 text-end">2%</div>
+          </div>
+        </div>
+
+        <!-- Filter options -->
+        <div class="filter-options mb-4">
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-secondary active">All Reviews</button>
+            <button class="btn btn-sm btn-outline-secondary">5 Star</button>
+            <button class="btn btn-sm btn-outline-secondary">4 Star</button>
+            <button class="btn btn-sm btn-outline-secondary">3 Star</button>
+            <button class="btn btn-sm btn-outline-secondary">2 Star</button>
+            <button class="btn btn-sm btn-outline-secondary">1 Star</button>
+            <div class="ms-auto">
+              <select class="form-select form-select-sm">
+                <option selected>Most Recent</option>
+                <option>Highest Rating</option>
+                <option>Lowest Rating</option>
+              </select>
             </div>
           </div>
         </div>
-      </div>
-      {{else}}
-      <div class="alert alert-info">No reviews yet for this product.</div>
-      {{end}}
-    </div>
-  </div>
 
-  <!-- Related Products -->
-  <div class="row mt-5">
-    <div class="col-12">
-      <h3 class="mb-4">Related Products</h3>
-      <div class="row">
-        {{range .relatedProducts}}
-        <div class="col-md-4 mb-4">
-          <div class="card h-100">
-            <img src="{{if .ImageURL}}{{.ImageURL}}{{else}}{{.Image}}{{end}}" class="card-img-top" alt="{{.Name}}">
+        <!-- Reviews list -->
+        <div class="reviews-list">
+          {{range .reviews}}
+          <div class="card mb-4 border-0 shadow-sm">
             <div class="card-body">
-              <h5 class="card-title">{{.Name}}</h5>
-              <p class="card-text text-truncate">{{.Description}}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="h5 mb-0">${{.Price}}</span>
-                <a href="/product/{{.ID}}" class="btn btn-primary">View Details</a>
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <img src="https://ui-avatars.com/api/?name={{.User}}&background=0D8ABC&color=fff" alt="{{.User}}"
+                    class="rounded-circle" style="width: 60px; height: 60px;">
+                </div>
+                <div class="ms-3 flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h5 class="mb-0">{{.User}}</h5>
+                    <span class="badge bg-primary">Verified Purchase</span>
+                  </div>
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="text-warning me-2">
+                      {{$rating := .Rating}}
+                      {{range $i := iterate 5}}
+                      {{if lt $i $rating}}
+                      <i class="bi bi-star-fill"></i>
+                      {{else}}
+                      <i class="bi bi-star"></i>
+                      {{end}}
+                      {{end}}
+                    </div>
+                    <small class="text-muted">{{.Date}}</small>
+                  </div>
+                  <h6 class="mb-2 fw-bold">Great product, worth every penny!</h6>
+                  <p class="mb-1">{{.Comment}}</p>
+                  <div class="d-flex align-items-center mt-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2">
+                      <i class="bi bi-hand-thumbs-up me-1"></i> Helpful (12)
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-flag me-1"></i> Report
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          {{else}}
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i> No reviews yet for this product. Be the first to write a review!
+          </div>
+          {{end}}
         </div>
-        {{else}}
-        <div class="col-12">
-          <div class="alert alert-info">No related products found.</div>
+
+        <!-- Pagination -->
+        <nav aria-label="Reviews pagination" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Write Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="reviewModalLabel">Write a Review</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <div class="rating-stars fs-3 text-warning">
+                  <i class="bi bi-star" data-rating="1"></i>
+                  <i class="bi bi-star" data-rating="2"></i>
+                  <i class="bi bi-star" data-rating="3"></i>
+                  <i class="bi bi-star" data-rating="4"></i>
+                  <i class="bi bi-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" id="rating-value" value="0">
+              </div>
+              <div class="mb-3">
+                <label for="review-title" class="form-label">Review Title</label>
+                <input type="text" class="form-control" id="review-title" placeholder="Summarize your experience">
+              </div>
+              <div class="mb-3">
+                <label for="review-comment" class="form-label">Your Review</label>
+                <textarea class="form-control" id="review-comment" rows="4"
+                  placeholder="What did you like or dislike? What did you use this product for?"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="submit-review">Submit Review</button>
+          </div>
         </div>
-        {{end}}
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="mb-4">Related Products</h3>
+        <div class="row">
+          {{range .relatedProducts}}
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <img src="{{if .ImageURL}}{{.ImageURL}}{{else}}{{.Image}}{{end}}" class="card-img-top" alt="{{.Name}}">
+              <div class="card-body">
+                <h5 class="card-title">{{.Name}}</h5>
+                <p class="card-text text-truncate">{{.Description}}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="h5 mb-0">${{.Price}}</span>
+                  <a href="/product/{{.ID}}" class="btn btn-primary">View Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {{else}}
+          <div class="col-12">
+            <div class="alert alert-info">No related products found.</div>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <div class="alert alert-danger">
+      <h4>Produto não encontrado</h4>
+      <p>Debug info:</p>
+      <ul>
+        <li>Requested product ID: {{.productID}}</li>
+        <li>Error message: {{.error}}</li>
+      </ul>
+    </div>
+    {{end}}
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body"></div>
+    </div>
+  </div>
+
+  <!-- Cart Sidebar -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="cartSidebar" aria-labelledby="cartSidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="cartSidebarLabel">Your Cart</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div id="cart-items-container">
+        <!-- Cart items will be loaded here -->
+        <div class="text-center py-5" id="empty-cart-message">
+          <i class="bi bi-cart text-muted" style="font-size: 3rem;"></i>
+          <p class="mt-3">Your cart is empty</p>
+          <a href="/products" class="btn btn-primary mt-3">Continue Shopping</a>
+        </div>
+      </div>
+      <div id="cart-summary" class="mt-4 border-top pt-4" style="display: none;">
+        <div class="d-flex justify-content-between mb-2">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Tax:</span>
+          <span id="cart-tax">$0.00</span>
+        </div>
+        <div class="d-flex justify-content-between mb-4">
+          <span class="fw-bold">Total:</span>
+          <span class="fw-bold" id="cart-total">$0.00</span>
+        </div>
+        <a href="/checkout" class="btn btn-primary w-100">Proceed to Checkout</a>
       </div>
     </div>
   </div>
-  {{else}}
-  <div class="alert alert-danger">
-    <h4>Produto não encontrado</h4>
-    <p>Debug info:</p>
-    <ul>
-      <li>Requested product ID: {{.productID}}</li>
-      <li>Error message: {{.error}}</li>
-    </ul>
-  </div>
-  {{end}}
-</div>
 
-<!-- Toast container -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Notification</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>TechStore</h5>
+          <p class="small">The best tech products for your needs.</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="/" class="text-decoration-none text-white-50">Home</a></li>
+            <li><a href="/products" class="text-decoration-none text-white-50">Products</a></li>
+            <li><a href="/support" class="text-decoration-none text-white-50">Support</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact</h5>
+          <ul class="list-unstyled text-white-50">
+            <li>123 Tech Street</li>
+            <li>San Francisco, CA 94107</li>
+            <li>info@techstore.com</li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Follow Us</h5>
+          <div class="d-flex gap-3 fs-4">
+            <a href="#" class="text-white"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="text-white"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="text-center text-white-50">
+        <small>&copy; 2024 TechStore. All rights reserved.</small>
+      </div>
     </div>
-    <div class="toast-body"></div>
-  </div>
-</div>
-{{end}}
+  </footer>
 
-{{define "scripts"}}
-<script>
-  function updateQuantity(productId, change) {
-    const input = document.getElementById(`quantity-${productId}`);
-    const newValue = parseInt(input.value) + change;
-    if (newValue > 0) {
-      input.value = newValue;
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <script>
+    function updateQuantity(productId, change) {
+      const input = document.getElementById(`quantity-${productId}`);
+      const newValue = parseInt(input.value) + change;
+      if (newValue > 0) {
+        input.value = newValue;
+      }
     }
-  }
 
-  function addToCart(productId) {
-    const quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+    function addToCart(productId) {
+      const quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
 
-    fetch('/cart/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        product: { id: productId },
-        quantity: quantity
+      fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product: { id: productId },
+          quantity: quantity
+        })
       })
-    })
-      .then(response => response.json())
-      .then(data => {
-        showToast('Product added to cart!');
-        updateCartCount();
+        .then(response => response.json())
+        .then(data => {
+          showToast('Product added to cart!');
+          updateCartCount();
+          updateCartSidebar();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error adding product to cart');
+        });
+    }
+
+    function showToast(message) {
+      const toast = new bootstrap.Toast(document.getElementById('toast'));
+      document.querySelector('.toast-body').textContent = message;
+      toast.show();
+    }
+
+    function updateCartCount() {
+      fetch('/cart')
+        .then(response => response.json())
+        .then(data => {
+          const count = data.cart.items.reduce((total, item) => total + item.quantity, 0);
+          const cartCountElement = document.querySelector('.badge.cart-count');
+          if (cartCountElement) {
+            cartCountElement.textContent = count;
+            cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+          }
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+    }
+
+    function updateCartSidebar() {
+      fetch('/cart')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('cart-items-container');
+          const emptyMessage = document.getElementById('empty-cart-message');
+          const cartSummary = document.getElementById('cart-summary');
+
+          // Clear previous items
+          container.innerHTML = '';
+
+          if (data.cart.items.length === 0) {
+            container.appendChild(emptyMessage);
+            cartSummary.style.display = 'none';
+          } else {
+            let subtotal = 0;
+
+            // Add each item to the cart
+            data.cart.items.forEach(item => {
+              const itemTotal = item.product.price * item.quantity;
+              subtotal += itemTotal;
+
+              const itemElement = document.createElement('div');
+              itemElement.className = 'cart-item d-flex align-items-center mb-3';
+              itemElement.innerHTML = `
+                <img src="${item.product.image || item.product.imageURL}" alt="${item.product.name}" class="img-fluid me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">${item.product.name}</h6>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">${item.quantity} × $${item.product.price.toFixed(2)}</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+                <button class="btn btn-sm text-danger" onclick="removeFromCart('${item.product.id}')">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              `;
+              container.appendChild(itemElement);
+            });
+
+            // Show and update the summary
+            cartSummary.style.display = 'block';
+            const tax = subtotal * 0.1; // 10% tax
+            const total = subtotal + tax;
+
+            document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+
+            // Open the cart sidebar
+            const cartSidebar = new bootstrap.Offcanvas(document.getElementById('cartSidebar'));
+            cartSidebar.show();
+          }
+        })
+        .catch(error => console.error('Error updating cart sidebar:', error));
+    }
+
+    function removeFromCart(productId) {
+      fetch('/cart/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product: { id: productId }
+        })
       })
-      .catch(error => {
-        console.error('Error:', error);
-        showToast('Error adding product to cart');
+        .then(response => response.json())
+        .then(data => {
+          showToast('Product removed from cart');
+          updateCartCount();
+          updateCartSidebar();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error removing product from cart');
+        });
+    }
+
+    function addToWishlist(productId) {
+      // In a real application, this would save to a database
+      showToast('Product added to wishlist!');
+      document.querySelector('.btn-outline-secondary i.bi-heart').classList.add('text-danger');
+    }
+
+    function shareProduct() {
+      // Get current URL
+      const url = window.location.href;
+      const title = document.querySelector('h1').textContent;
+
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: url
+        })
+          .then(() => console.log('Successful share'))
+          .catch((error) => console.log('Error sharing:', error));
+      } else {
+        // Copy to clipboard as fallback
+        navigator.clipboard.writeText(url)
+          .then(() => showToast('Link copied to clipboard!'))
+          .catch(err => console.error('Error copying text: ', err));
+      }
+    }
+
+    // Update cart count on page load
+    updateCartCount();
+
+    // Update buttons to call the proper functions
+    document.addEventListener('DOMContentLoaded', function () {
+      // Update the "Add to Wishlist" button
+      const wishlistButton = document.querySelector('.btn-outline-secondary i.bi-heart').parentElement;
+      wishlistButton.onclick = function () {
+        addToWishlist('{{.Product.ID}}');
+      };
+
+      // Update the "Share" button
+      const shareButton = document.querySelector('.btn-outline-secondary i.bi-share').parentElement;
+      shareButton.onclick = function () {
+        shareProduct();
+      };
+
+      // Setup cart icon in navbar to open sidebar
+      const cartIcon = document.querySelector('.nav-link i.bi-cart3').parentElement;
+      if (cartIcon) {
+        cartIcon.setAttribute('data-bs-toggle', 'offcanvas');
+        cartIcon.setAttribute('data-bs-target', '#cartSidebar');
+        cartIcon.setAttribute('aria-controls', 'cartSidebar');
+      }
+    });
+
+    // Setup rating stars in review modal
+    document.addEventListener('DOMContentLoaded', function () {
+      const ratingStars = document.querySelectorAll('.rating-stars i');
+      const ratingInput = document.getElementById('rating-value');
+
+      ratingStars.forEach(star => {
+        star.addEventListener('mouseover', function () {
+          const rating = parseInt(this.getAttribute('data-rating'));
+
+          // Reset all stars
+          ratingStars.forEach(s => s.classList.remove('bi-star-fill', 'bi-star'));
+
+          // Fill stars up to the hovered one
+          ratingStars.forEach((s, index) => {
+            if (index < rating) {
+              s.classList.add('bi-star-fill');
+            } else {
+              s.classList.add('bi-star');
+            }
+          });
+        });
+
+        star.addEventListener('click', function () {
+          const rating = parseInt(this.getAttribute('data-rating'));
+          ratingInput.value = rating;
+        });
       });
-  }
 
-  function showToast(message) {
-    const toast = new bootstrap.Toast(document.getElementById('toast'));
-    document.querySelector('.toast-body').textContent = message;
-    toast.show();
-  }
-</script>
-{{end}}
+      // Reset stars when mouse leaves the container
+      document.querySelector('.rating-stars').addEventListener('mouseleave', function () {
+        const currentRating = parseInt(ratingInput.value) || 0;
+
+        // Reset all stars
+        ratingStars.forEach(s => s.classList.remove('bi-star-fill', 'bi-star'));
+
+        // Fill stars based on current rating
+        ratingStars.forEach((s, index) => {
+          if (index < currentRating) {
+            s.classList.add('bi-star-fill');
+          } else {
+            s.classList.add('bi-star');
+          }
+        });
+      });
+
+      // Submit review button
+      const submitReviewBtn = document.getElementById('submit-review');
+      if (submitReviewBtn) {
+        submitReviewBtn.addEventListener('click', function () {
+          const rating = parseInt(ratingInput.value);
+          const title = document.getElementById('review-title').value;
+          const comment = document.getElementById('review-comment').value;
+
+          if (rating === 0) {
+            alert('Please select a rating');
+            return;
+          }
+
+          if (!title || !comment) {
+            alert('Please fill out all fields');
+            return;
+          }
+
+          // Here you would typically send the review data to the server
+          // For now, we'll just show a success message and close the modal
+          showToast('Your review has been submitted. Thank you!', 'success');
+
+          // Close the modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+          modal.hide();
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

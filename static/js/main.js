@@ -347,13 +347,165 @@ function showToast(message, type = 'info') {
  * Adiciona um produto ao carrinho
  * @param {string} productId - ID do produto
  */
-function addToCart(productId) {
-  console.log(`Adicionando produto ID ${productId} ao carrinho`);
-  // Simulação de adição ao carrinho
-  // Em uma aplicação real, enviaria uma requisição ao servidor
+function addToCart(productId, quantity = 1) {
+  console.log(`Adicionando produto ID ${productId} ao carrinho, quantidade: ${quantity}`);
 
-  // Atualizar contador do carrinho
-  updateCartCount(1);
+  fetch('/cart/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      product: { id: productId },
+      quantity: quantity
+    })
+  })
+    .then(response => response.json())
+    .then(data => {
+      // Mostra notificação de sucesso
+      showToast('Product added to cart!', 'success');
+
+      // Atualiza o contador do carrinho
+      updateCartCount();
+
+      // Abre o carrinho lateral
+      updateCartSidebar();
+    })
+    .catch(error => {
+      console.error('Error adding to cart:', error);
+      showToast('Failed to add product to cart', 'error');
+    });
+}
+
+/**
+ * Remove um produto do carrinho
+ * @param {string} productId - ID do produto
+ */
+function removeFromCart(productId) {
+  fetch('/cart/remove', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      product: { id: productId }
+    })
+  })
+    .then(response => response.json())
+    .then(data => {
+      showToast('Product removed from cart', 'info');
+      updateCartCount();
+      updateCartSidebar();
+    })
+    .catch(error => {
+      console.error('Error removing from cart:', error);
+      showToast('Failed to remove product from cart', 'error');
+    });
+}
+
+/**
+ * Atualiza o contador de itens no carrinho
+ */
+function updateCartCount() {
+  fetch('/cart')
+    .then(response => response.json())
+    .then(data => {
+      const count = data.cart.items.reduce((total, item) => total + item.quantity, 0);
+      const cartCountElements = document.querySelectorAll('.cart-count');
+
+      cartCountElements.forEach(element => {
+        element.textContent = count;
+        element.style.display = count > 0 ? 'inline-flex' : 'none';
+      });
+    })
+    .catch(error => {
+      console.error('Error updating cart count:', error);
+    });
+}
+
+/**
+ * Atualiza o conteúdo do carrinho lateral
+ * @param {boolean} open - Se deve abrir o carrinho lateral após atualizar
+ */
+function updateCartSidebar(open = true) {
+  // Verificar se o elemento do carrinho lateral existe
+  const cartSidebar = document.getElementById('cartSidebar');
+  if (!cartSidebar) return;
+
+  fetch('/cart')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('cart-items-container');
+      const emptyMessage = document.getElementById('empty-cart-message');
+      const cartSummary = document.getElementById('cart-summary');
+
+      // Limpar itens anteriores
+      if (container.children.length > 0 && container.children[0].id !== 'empty-cart-message') {
+        container.innerHTML = '';
+      }
+
+      if (data.cart.items.length === 0) {
+        // Carrinho vazio
+        if (!document.getElementById('empty-cart-message')) {
+          container.innerHTML = `
+            <div class="text-center py-5" id="empty-cart-message">
+              <i class="bi bi-cart text-muted" style="font-size: 3rem;"></i>
+              <p class="mt-3">Your cart is empty</p>
+              <a href="/products" class="btn btn-primary mt-3">Continue Shopping</a>
+            </div>
+          `;
+        }
+        if (cartSummary) cartSummary.style.display = 'none';
+      } else {
+        // Carrinho com itens
+        container.innerHTML = ''; // Limpar conteúdo
+
+        let subtotal = 0;
+
+        // Adicionar cada item ao carrinho
+        data.cart.items.forEach(item => {
+          const itemTotal = item.product.price * item.quantity;
+          subtotal += itemTotal;
+
+          const itemElement = document.createElement('div');
+          itemElement.className = 'cart-item d-flex align-items-center mb-3 p-2 border-bottom';
+          itemElement.innerHTML = `
+            <img src="${item.product.image || item.product.imageURL}" alt="${item.product.name}" class="img-fluid me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+            <div class="flex-grow-1">
+              <h6 class="mb-0">${item.product.name}</h6>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">${item.quantity} × $${item.product.price.toFixed(2)}</span>
+                <span>$${itemTotal.toFixed(2)}</span>
+              </div>
+            </div>
+            <button class="btn btn-sm text-danger" onclick="removeFromCart('${item.product.id}')">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          `;
+          container.appendChild(itemElement);
+        });
+
+        // Atualizar o sumário
+        if (cartSummary) {
+          cartSummary.style.display = 'block';
+          const tax = subtotal * 0.1; // 10% de imposto
+          const total = subtotal + tax;
+
+          document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+          document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
+          document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Abrir o carrinho lateral se solicitado
+        if (open) {
+          const bsOffcanvas = new bootstrap.Offcanvas(cartSidebar);
+          bsOffcanvas.show();
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error updating cart sidebar:', error);
+    });
 }
 
 /**
@@ -362,37 +514,103 @@ function addToCart(productId) {
  */
 function addToWishlist(productId) {
   console.log(`Adicionando produto ID ${productId} à lista de desejos`);
-  // Simulação de adição à lista de desejos
-}
 
-/**
- * Abre o modal de visualização rápida
- * @param {string} productId - ID do produto
- */
-function quickViewProduct(productId) {
-  console.log(`Abrindo visualização rápida do produto ID ${productId}`);
-  // Implementação do modal de visualização rápida
-}
+  // Simulação de adição à lista de desejos (em uma aplicação real, isso seria uma requisição ao servidor)
+  const button = document.querySelector(`.add-to-wishlist[data-id="${productId}"]`);
+  if (button) {
+    button.classList.toggle('active');
 
-/**
- * Atualiza o contador de itens no carrinho
- * @param {number} increment - Valor a ser incrementado
- */
-function updateCartCount(increment = 0) {
-  const cartCountElement = document.querySelector('.cart-count');
-  if (cartCountElement) {
-    let count = parseInt(cartCountElement.textContent) || 0;
-    count += increment;
-    cartCountElement.textContent = count;
-
-    // Mostrar ou esconder o contador
-    if (count > 0) {
-      cartCountElement.style.display = 'inline-flex';
+    if (button.classList.contains('active')) {
+      button.innerHTML = '<i class="bi bi-heart-fill"></i>';
+      showToast('Added to wishlist!', 'success');
     } else {
-      cartCountElement.style.display = 'none';
+      button.innerHTML = '<i class="bi bi-heart"></i>';
+      showToast('Removed from wishlist', 'info');
     }
+  } else {
+    showToast('Added to wishlist!', 'success');
   }
 }
+
+/**
+ * Compartilha um produto
+ * @param {string} productId - ID do produto
+ * @param {string} productName - Nome do produto
+ */
+function shareProduct(productId, productName) {
+  const url = window.location.origin + '/product/' + productId;
+  const title = productName || 'Check out this product';
+
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      url: url
+    })
+      .then(() => console.log('Successful share'))
+      .catch((error) => {
+        console.log('Error sharing:', error);
+        fallbackShare(url);
+      });
+  } else {
+    fallbackShare(url);
+  }
+}
+
+/**
+ * Método alternativo de compartilhamento quando a Web Share API não está disponível
+ * @param {string} url - URL para compartilhar
+ */
+function fallbackShare(url) {
+  // Copia para a área de transferência
+  navigator.clipboard.writeText(url)
+    .then(() => showToast('Link copied to clipboard!', 'success'))
+    .catch(err => {
+      console.error('Error copying text: ', err);
+
+      // Criar um campo de texto temporário
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.style.position = 'fixed';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        showToast('Link copied to clipboard!', 'success');
+      } catch (err) {
+        showToast('Failed to copy link', 'error');
+      }
+
+      document.body.removeChild(textarea);
+    });
+}
+
+// Inicializar o contador do carrinho quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function () {
+  updateCartCount();
+
+  // Configurar o botão do carrinho na navbar para abrir o carrinho lateral
+  const cartButtons = document.querySelectorAll('.cart-icon, .nav-link[href="/cart"]');
+  cartButtons.forEach(button => {
+    button.addEventListener('click', function (e) {
+      // Se o elemento do carrinho lateral existir, previnir o comportamento padrão
+      // e abrir o carrinho lateral em vez de navegar para /cart
+      if (document.getElementById('cartSidebar')) {
+        e.preventDefault();
+        updateCartSidebar(true);
+      }
+    });
+
+    // Atualizar atributos para funcionar com o Bootstrap Offcanvas
+    if (document.getElementById('cartSidebar')) {
+      button.setAttribute('data-bs-toggle', 'offcanvas');
+      button.setAttribute('data-bs-target', '#cartSidebar');
+      button.setAttribute('aria-controls', 'cartSidebar');
+      button.removeAttribute('href');
+    }
+  });
+});
 
 async function loadFilters() {
   try {
@@ -742,38 +960,6 @@ function updateQuantity(productId, change) {
     .catch(error => {
       console.error('Error updating quantity:', error);
       showToast('Error updating cart');
-    });
-}
-
-// Remove from cart
-function removeFromCart(productId) {
-  fetch('/cart/remove', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      product: { id: productId }
-    })
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to remove from cart');
-      }
-      return response.json();
-    })
-    .then(data => {
-      updateCartCount();
-      showToast('Product removed from cart');
-      // Remove the item from the DOM
-      const item = document.querySelector(`.cart-item[data-product-id="${productId}"]`);
-      if (item) {
-        item.remove();
-      }
-    })
-    .catch(error => {
-      console.error('Error removing from cart:', error);
-      showToast('Error removing product from cart');
     });
 }
 

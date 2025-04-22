@@ -106,12 +106,14 @@ func main() {
 	// Configure custom template functions
 	r.SetFuncMap(template.FuncMap{
 		"iterate": func(count int) []int {
-			var i int
-			var items []int
-			for i = 0; i < count; i++ {
-				items = append(items, i)
+			items := make([]int, count)
+			for i := 0; i < count; i++ {
+				items[i] = i
 			}
 			return items
+		},
+		"multiply": func(a, b float64) float64 {
+			return a * b
 		},
 	})
 
@@ -122,6 +124,7 @@ func main() {
 		"templates/product-detail.html",
 		"templates/cart.html",
 		"templates/support.html",
+		"templates/checkout.html",
 	)
 
 	// Serve arquivos estáticos
@@ -141,11 +144,8 @@ func main() {
 				newProducts = append(newProducts, product)
 			}
 		}
-
-	
-		c.HTML(http.StatusOK, "home.html", gin.H{
 		fmt.Println("Rota / foi chamada! Renderizando home.html...")
-
+		c.HTML(http.StatusOK, "home.html", gin.H{
 			"title":           "Home",
 			"products":        products,
 			"popularProducts": popularProducts,
@@ -238,6 +238,33 @@ func main() {
 			"Product":         product,
 			"reviews":         reviews,
 			"relatedProducts": relatedProducts,
+		})
+	})
+
+	// Página de checkout
+	r.GET("/checkout", func(c *gin.Context) {
+		// Calcular o subtotal e o total do carrinho
+		subtotal := 0.0
+		for _, item := range cart.Items {
+			subtotal += item.Product.Price * float64(item.Quantity)
+		}
+		
+		// Aplicar taxas e frete (simulado)
+		tax := subtotal * 0.1  // 10% de imposto
+		shipping := 0.0
+		if subtotal < 100 {
+			shipping = 15.0  // $15 de frete para compras abaixo de $100
+		}
+		
+		total := subtotal + tax + shipping
+		
+		c.HTML(http.StatusOK, "checkout.html", gin.H{
+			"title":     "Checkout",
+			"cart":      cart,
+			"subtotal":  subtotal,
+			"tax":       tax,
+			"shipping":  shipping,
+			"total":     total,
 		})
 	})
 

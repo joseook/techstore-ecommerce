@@ -57,6 +57,8 @@ Golang E-commerce is a robust and scalable e-commerce solution built with Go's G
 ```
 golang-ecommerce/
 ├── main.go              # Main application entry point
+├── api/                 # Vercel serverless functions
+│   └── index.go         # Main serverless handler
 ├── templates/           # HTML templates
 │   ├── home.html        # Homepage template
 │   ├── products.html    # Products listing page
@@ -83,6 +85,22 @@ golang-ecommerce/
 | POST | `/cart/add` | Add item to cart |
 | POST | `/cart/update` | Update cart item |
 | POST | `/cart/remove` | Remove item from cart |
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+This project is configured for deployment on Vercel:
+
+1. Fork or clone this repository
+2. Connect your GitHub repository to Vercel
+3. Vercel will automatically detect the project as a Go project
+4. The deployment will use the configuration in `vercel.json`
+
+If you encounter any issues with deployment, make sure:
+- The `vercel.json` file is properly configured
+- The Go version is set to 1.21 or higher
+- The `api/index.go` file is present
 
 ## 📝 License
 

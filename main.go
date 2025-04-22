@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,7 +97,8 @@ func init() {
 	}
 }
 
-func main() {
+// setupRouter configures and returns the Gin router
+func setupRouter() *gin.Engine {
 	// Define modo release para Gin
 	gin.SetMode(gin.ReleaseMode)
 
@@ -405,9 +407,6 @@ func main() {
 		c.JSON(http.StatusOK, cart)
 	})
 
-	// Inicia o servidor
-	fmt.Println("Server is running on http://localhost:8080")
-	
 	// Adicione uma rota para servir produtos do modelo models/product.go
 	// Esta é uma rota de backup para quando a API principal não funcionar
 	r.GET("/products/api", func(c *gin.Context) {
@@ -437,8 +436,24 @@ func main() {
 		
 		c.JSON(http.StatusOK, modelProducts)
 	})
+
+	return r
+}
+
+func main() {
+	// Get port from environment variable for Vercel compatibility
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default port if not specified
+	}
+
+	// Setup router
+	r := setupRouter()
 	
-	if err := r.Run(":8080"); err != nil {
+	// Inicia o servidor
+	fmt.Printf("Server is running on http://localhost:%s\n", port)
+	
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

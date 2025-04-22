@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "*.go",
+      "src": "api/*.go",
       "use": "@vercel/go"
     }
   ],
@@ -12,7 +12,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/main.go"
+      "dest": "/api/index.go"
     }
   ],
   "env": {

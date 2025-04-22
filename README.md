@@ -24,7 +24,7 @@ Golang E-commerce is a robust and scalable e-commerce solution built with Go's G
 ### Prerequisites
 
 - Go 1.21 or higher
-- Git
+
 
 ### Installation
 

@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	
-	"github.com/joseok/techstore-ecommerce/api"
+	"github.com/joseook/techstore-ecommerce/api"
 )
 
 // Handler is a wrapper function that calls the api.Handler

@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	"fmt"
@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Product representa um produto na loja
 type Product struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`

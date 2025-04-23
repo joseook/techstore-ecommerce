@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -104,6 +106,27 @@ func setupRouter() *gin.Engine {
 	// Cria um novo roteador Gin
 	r := gin.Default()
 
+	// Log do ambiente atual
+	dir, _ := os.Getwd()
+	log.Printf("Current working directory: %s", dir)
+	log.Printf("Listing files in current directory:")
+	files, _ := os.ReadDir(dir)
+	for _, file := range files {
+		log.Printf("- %s", file.Name())
+	}
+	
+	// Ver se a pasta templates existe
+	log.Printf("Checking templates directory:")
+	templatesDir := filepath.Join(dir, "templates")
+	templateFiles, err := os.ReadDir(templatesDir)
+	if err != nil {
+		log.Printf("Error reading templates directory: %v", err)
+	} else {
+		for _, file := range templateFiles {
+			log.Printf("- Template: %s", file.Name())
+		}
+	}
+
 	// Configure custom template functions
 	r.SetFuncMap(template.FuncMap{
 		"iterate": func(count int) []int {
@@ -118,18 +141,22 @@ func setupRouter() *gin.Engine {
 		},
 	})
 
-	// Carrega cada template individualmente
+	// Carrega templates usando caminhos absolutos
+	templatePath := filepath.Join(dir, "templates")
+	log.Printf("Loading templates from: %s", templatePath)
 	r.LoadHTMLFiles(
-		"templates/home.html",
-		"templates/products.html",
-		"templates/product-detail.html",
-		"templates/cart.html",
-		"templates/support.html",
-		"templates/checkout.html",
+		filepath.Join(templatePath, "home.html"),
+		filepath.Join(templatePath, "products.html"),
+		filepath.Join(templatePath, "product-detail.html"),
+		filepath.Join(templatePath, "cart.html"),
+		filepath.Join(templatePath, "support.html"),
+		filepath.Join(templatePath, "checkout.html"),
 	)
 
-	// Serve arquivos estáticos
-	r.Static("/static", "./static")
+	// Serve arquivos estáticos com caminho absoluto
+	staticPath := filepath.Join(dir, "static")
+	log.Printf("Serving static files from: %s", staticPath)
+	r.Static("/static", staticPath)
 
 	// Rotas
 	r.GET("/", func(c *gin.Context) {
@@ -441,6 +468,20 @@ func setupRouter() *gin.Engine {
 
 // Handler is the main entry point for Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// Log para debug
+	log.Printf("Vercel Handler called with path: %s", r.URL.Path)
+	
+	// Verificar se é uma solicitação para um recurso estático que pode ser servido diretamente
+	if strings.HasPrefix(r.URL.Path, "/static/") || strings.HasPrefix(r.URL.Path, "/templates/") {
+		http.FileServer(http.Dir(".")).ServeHTTP(w, r)
+		return
+	}
+	
+	// Verificar ambiente Vercel
+	if os.Getenv("VERCEL") != "" {
+		log.Printf("Running in Vercel environment")
+	}
+	
 	// Create a new Gin router
 	router := setupRouter()
 	

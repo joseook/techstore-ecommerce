@@ -440,20 +440,28 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
+// Handler is the main entry point for Vercel
+func Handler(w http.ResponseWriter, r *http.Request) {
+	router := setupRouter()
+	router.ServeHTTP(w, r)
+}
+
 func main() {
-	// Get port from environment variable for Vercel compatibility
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080" // Default port if not specified
+	// Check if we're running in Vercel
+	if os.Getenv("VERCEL") != "" {
+		// In Vercel, we don't need to start the server
+		// The Handler function will be used instead
+		return
 	}
 
-	// Setup router
-	r := setupRouter()
-	
-	// Inicia o servidor
-	fmt.Printf("Server is running on http://localhost:%s\n", port)
-	
-	if err := r.Run(":" + port); err != nil {
+	// For local development
+	router := setupRouter()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("Server starting on port %s", port)
+	if err := router.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

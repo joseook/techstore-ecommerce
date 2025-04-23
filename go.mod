@@ -1,4 +1,4 @@
-module github.com/joseok/golang-ecommerce
+module github.com/joseok/techstore-ecommerce
 
 go 1.18
 

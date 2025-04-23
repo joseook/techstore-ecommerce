@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"sort"
-	"github.com/joseok/golang-ecommerce/models"
+	"github.com/joseok/techstore-ecommerce/models"
 	"github.com/gorilla/mux"
 )
 

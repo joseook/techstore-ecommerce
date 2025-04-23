@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"github.com/joseok/golang-ecommerce/models"
+	"github.com/joseok/techstore-ecommerce/models"
 )
 
 type CartItem struct {

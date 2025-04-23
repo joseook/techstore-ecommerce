@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	
-	"github.com/joseok/golang-ecommerce/api"
+	"github.com/joseok/techstore-ecommerce/api"
 )
 
 // Handler is a wrapper function that calls the api.Handler

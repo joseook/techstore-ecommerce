@@ -1,4 +1,4 @@
-module handler
+module github.com/joseok/golang-ecommerce
 
 go 1.18
 

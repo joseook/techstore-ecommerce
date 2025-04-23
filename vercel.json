@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.go",
+      "src": "index.go",
       "use": "@vercel/go"
     }
   ],
@@ -13,7 +13,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.go"
+      "dest": "/"
     }
   ],
   "env": {

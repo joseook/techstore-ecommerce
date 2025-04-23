@@ -445,11 +445,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// Create a new Gin router
 	router := setupRouter()
 	
-	// Convert the http.Request to a Gin context
-	ginContext := &gin.Context{
-		Request: r,
-		Writer:  w,
-	}
+	// Create a Gin context using CreateTestContext to properly wrap the ResponseWriter
+	ginContext, _ := gin.CreateTestContext(w)
+	ginContext.Request = r
 	
 	// Handle the request
 	router.HandleContext(ginContext)

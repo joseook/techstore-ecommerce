@@ -1,4 +1,4 @@
-package api
+package main
 
 // Product represents a product in the store
 type Product struct {

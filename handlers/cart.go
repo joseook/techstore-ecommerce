@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"github.com/joseok/techstore-ecommerce/models"
+	"github.com/joseook/techstore-ecommerce/models"
 )
 
 type CartItem struct {

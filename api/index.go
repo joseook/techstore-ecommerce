@@ -1,9 +1,7 @@
 package api
 
 import (
-	"html/template"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 

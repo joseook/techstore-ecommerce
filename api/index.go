@@ -93,50 +93,51 @@ func init() {
 	}
 }
 
-// Handler is the serverless function entry point for Vercel
+// Handler is the main entry point for Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
-	// Setup Gin in release mode
-	gin.SetMode(gin.ReleaseMode)
+	// Create a new Gin router
+	router := setupRouter()
 	
-	// Create a Gin router with default middleware
+	// Convert the http.Request to a Gin context
+	ginContext := &gin.Context{
+		Request: r,
+		Writer:  w,
+	}
+	
+	// Handle the request
+	router.HandleContext(ginContext)
+}
+
+// SetupRouter sets up the Gin router
+func setupRouter() *gin.Engine {
 	router := gin.Default()
 	
-	// Create a new gin context from the request and writer
-	ctx, _ := gin.CreateTestContext(w)
-	ctx.Request = r
-	
 	// Handle static files
-	if strings.HasPrefix(r.URL.Path, "/static/") {
-		file := strings.TrimPrefix(r.URL.Path, "/static/")
-		http.ServeFile(w, r, filepath.Join("static", file))
-		return
-	}
+	router.Static("/static", "static")
 	
 	// For API demonstration, we'll return JSON data for now
-	if r.URL.Path == "/" || r.URL.Path == "" {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Golang E-commerce API",
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message":  "Golang E-commerce API",
 			"products": products,
 		})
-		return
-	}
+	})
 	
 	// Handle product listing
-	if r.URL.Path == "/products" {
-		ctx.JSON(http.StatusOK, gin.H{
+	router.GET("/products", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
 			"products": products,
 		})
-		return
-	}
+	})
 	
 	// Handle product details by ID
-	if strings.HasPrefix(r.URL.Path, "/product/") {
-		idStr := strings.TrimPrefix(r.URL.Path, "/product/")
+	router.GET("/product/:id", func(c *gin.Context) {
+		id := c.Param("id")
 		var product Product
 		found := false
 		
 		for _, p := range products {
-			if p.ID == idStr {
+			if p.ID == id {
 				product = p
 				found = true
 				break
@@ -144,16 +145,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		}
 		
 		if found {
-			ctx.JSON(http.StatusOK, product)
+			c.JSON(http.StatusOK, product)
 		} else {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		}
-		return
-	}
-	
-	// Handle 404 for all other routes
-	ctx.JSON(http.StatusNotFound, gin.H{
-		"error": "Not found",
-		"path": r.URL.Path,
 	})
+	
+	return router
 } 

@@ -442,8 +442,17 @@ func setupRouter() *gin.Engine {
 
 // Handler is the main entry point for Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// Create a new Gin router
 	router := setupRouter()
-	router.ServeHTTP(w, r)
+	
+	// Convert the http.Request to a Gin context
+	ginContext := &gin.Context{
+		Request: r,
+		Writer:  w,
+	}
+	
+	// Handle the request
+	router.HandleContext(ginContext)
 }
 
 func main() {

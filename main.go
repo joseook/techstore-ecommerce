@@ -98,6 +98,571 @@ func init() {
 	}
 }
 
+// Função para verificar ambiente Vercel
+func isVercelEnvironment() bool {
+	return os.Getenv("VERCEL") != "" || os.Getenv("VERCEL_ENV") != ""
+}
+
+// Templates embutidos para ambiente Vercel
+var (
+	// Templates básicos para ambiente Vercel
+	homeTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore - Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .products { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+        .product { border: 1px solid #ddd; padding: 15px; width: 250px; }
+        img { max-width: 100%; height: auto; }
+        .price { font-weight: bold; color: #e44d26; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; display: inline-block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to TechStore</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Products</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Popular Products</h2>
+        <div class="products">
+            {{range .popularProducts}}
+            <div class="product">
+                <img src="{{.ImageURL}}" alt="{{.Name}}">
+                <h3>{{.Name}}</h3>
+                <p class="price">${{.Price}}</p>
+                <p>{{.Description}}</p>
+                <a href="/product/{{.ID}}" class="btn">View Details</a>
+            </div>
+            {{end}}
+        </div>
+        
+        <h2>New Arrivals</h2>
+        <div class="products">
+            {{range .newProducts}}
+            <div class="product">
+                <img src="{{.ImageURL}}" alt="{{.Name}}">
+                <h3>{{.Name}}</h3>
+                <p class="price">${{.Price}}</p>
+                <p>{{.Description}}</p>
+                <a href="/product/{{.ID}}" class="btn">View Details</a>
+            </div>
+            {{end}}
+        </div>
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+
+	productDetailTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .product-container { display: flex; gap: 30px; margin-top: 30px; }
+        .product-image { flex: 1; }
+        .product-info { flex: 1; }
+        img { max-width: 100%; height: auto; }
+        .price { font-size: 24px; font-weight: bold; color: #e44d26; margin: 15px 0; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; display: inline-block; border: none; cursor: pointer; font-size: 16px; }
+        .reviews { margin-top: 40px; }
+        .review { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .rating { color: gold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TechStore</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Products</a>
+        </nav>
+    </header>
+    
+    <main>
+        {{if .error}}
+            <h2>Error: {{.error}}</h2>
+            <p>Product with ID {{.productID}} was not found.</p>
+            <a href="/products" class="btn">Back to Products</a>
+        {{else}}
+            <div class="product-container">
+                <div class="product-image">
+                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}">
+                </div>
+                <div class="product-info">
+                    <h1>{{.Product.Name}}</h1>
+                    <p class="price">${{.Product.Price}}</p>
+                    <p>{{.Product.Description}}</p>
+                    <p><strong>Category:</strong> {{.Product.Category}}</p>
+                    
+                    <button class="btn">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="reviews">
+                <h2>Customer Reviews</h2>
+                {{range .reviews}}
+                <div class="review">
+                    <p class="rating">
+                        {{range (iterate 5)}}
+                            {{if lt . (int $.Rating)}}★{{else}}☆{{end}}
+                        {{end}}
+                    </p>
+                    <p>"{{.Comment}}"</p>
+                    <p><strong>{{.User}}</strong> - {{.Date}}</p>
+                </div>
+                {{end}}
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h2>Related Products</h2>
+                <div class="products" style="display: flex; gap: 20px;">
+                    {{range .relatedProducts}}
+                    <div style="border: 1px solid #ddd; padding: 15px; width: 250px;">
+                        <img src="{{.ImageURL}}" alt="{{.Name}}" style="max-width: 100%;">
+                        <h3>{{.Name}}</h3>
+                        <p class="price">${{.Price}}</p>
+                        <a href="/product/{{.ID}}" class="btn">View Details</a>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        {{end}}
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+
+	productsTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .container { display: flex; gap: 30px; margin-top: 30px; }
+        .sidebar { width: 250px; }
+        .products { display: flex; flex-wrap: wrap; gap: 20px; flex: 1; }
+        .product { border: 1px solid #ddd; padding: 15px; width: 250px; }
+        img { max-width: 100%; height: auto; }
+        .price { font-weight: bold; color: #e44d26; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; display: inline-block; margin-top: 10px; }
+        .filter-section { margin-bottom: 20px; border: 1px solid #eee; padding: 15px; }
+        .filter-title { font-weight: bold; margin-bottom: 10px; }
+        .filter-option { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TechStore - Products</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Products</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="sidebar">
+                <div class="filter-section">
+                    <div class="filter-title">Categories</div>
+                    <div class="filter-option"><a href="/products">All Products</a></div>
+                    <div class="filter-option"><a href="/products?category=Electronics">Electronics</a></div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-title">Price Range</div>
+                    <div class="filter-option"><a href="/products">All Prices</a></div>
+                    <div class="filter-option"><a href="/products">Under $100</a></div>
+                    <div class="filter-option"><a href="/products">$100 - $200</a></div>
+                    <div class="filter-option"><a href="/products">Over $200</a></div>
+                </div>
+            </div>
+            
+            <div>
+                <h2>{{.title}}</h2>
+                <div class="products">
+                    {{range .products}}
+                    <div class="product">
+                        <img src="{{.ImageURL}}" alt="{{.Name}}">
+                        <h3>{{.Name}}</h3>
+                        <p class="price">${{.Price}}</p>
+                        <p>{{.Description}}</p>
+                        <a href="/product/{{.ID}}" class="btn">View Details</a>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+
+	cartTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .cart-container { margin-top: 30px; }
+        .cart-item { display: flex; border-bottom: 1px solid #eee; padding: 15px 0; align-items: center; }
+        .item-image { width: 100px; margin-right: 20px; }
+        .item-details { flex: 1; }
+        .item-actions { width: 150px; text-align: right; }
+        .quantity-control { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; }
+        .btn-quantity { width: 30px; height: 30px; font-size: 16px; }
+        .quantity { padding: 0 10px; }
+        .summary { margin-top: 30px; padding: 20px; background-color: #f9f9f9; }
+        .summary-row { display: flex; justify-content: space-between; margin: 10px 0; }
+        .total { font-size: 20px; font-weight: bold; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; display: inline-block; border: none; cursor: pointer; font-size: 16px; }
+        .btn-checkout { background-color: #e44d26; width: 100%; margin-top: 20px; padding: 15px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Shopping Cart</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Continue Shopping</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="cart-container">
+            <h2>Cart Items</h2>
+            
+            {{if .cart.Items}}
+                {{range .cart.Items}}
+                <div class="cart-item">
+                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="item-image">
+                    <div class="item-details">
+                        <h3>{{.Product.Name}}</h3>
+                        <p class="price">${{.Product.Price}}</p>
+                    </div>
+                    <div class="item-actions">
+                        <div class="quantity-control">
+                            <button class="btn-quantity">-</button>
+                            <span class="quantity">{{.Quantity}}</span>
+                            <button class="btn-quantity">+</button>
+                        </div>
+                        <button class="btn">Remove</button>
+                    </div>
+                </div>
+                {{end}}
+                
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>$100.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (10%):</span>
+                        <span>$10.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span>$5.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span>$115.00</span>
+                    </div>
+                    
+                    <a href="/checkout" class="btn btn-checkout">Proceed to Checkout</a>
+                </div>
+            {{else}}
+                <p>Your cart is empty. <a href="/products">Start shopping</a></p>
+            {{end}}
+        </div>
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+
+	checkoutTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .checkout-container { display: flex; gap: 30px; margin-top: 30px; }
+        .checkout-form { flex: 2; }
+        .order-summary { flex: 1; background-color: #f9f9f9; padding: 20px; height: fit-content; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .summary-row { display: flex; justify-content: space-between; margin: 10px 0; }
+        .total { font-size: 20px; font-weight: bold; margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
+        .btn { background-color: #4CAF50; color: white; padding: 15px; text-decoration: none; display: inline-block; border: none; cursor: pointer; font-size: 18px; width: 100%; margin-top: 20px; }
+        .order-item { display: flex; margin-bottom: 10px; }
+        .item-details { margin-left: 10px; flex: 1; }
+        .item-image { width: 50px; height: 50px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Checkout</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Products</a> |
+            <a href="/cart">Cart</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="checkout-container">
+            <div class="checkout-form">
+                <h2>Billing Details</h2>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">ZIP Code</label>
+                            <input type="text" id="zip" required>
+                        </div>
+                    </div>
+                    
+                    <h2>Payment Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expDate">Expiration Date</label>
+                            <input type="text" id="expDate" placeholder="MM/YY" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Place Order</button>
+                </form>
+            </div>
+            
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                
+                {{range .cart.Items}}
+                <div class="order-item">
+                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="item-image">
+                    <div class="item-details">
+                        <div>{{.Product.Name}} x {{.Quantity}}</div>
+                        <div>${{multiply .Product.Price (float64 .Quantity)}}</div>
+                    </div>
+                </div>
+                {{end}}
+                
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>${{.subtotal}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax:</span>
+                    <span>${{.tax}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span>${{.shipping}}</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span>${{.total}}</span>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+
+	supportTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        header { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .support-container { max-width: 800px; margin: 30px auto; }
+        .faq-item { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .faq-question { font-weight: bold; margin-bottom: 10px; font-size: 18px; }
+        .contact-form { margin-top: 40px; background-color: #f9f9f9; padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+        textarea { height: 150px; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; display: inline-block; border: none; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Customer Support</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/products">Products</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="support-container">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">How do I track my order?</div>
+                <div class="faq-answer">
+                    Once your order ships, you will receive a shipping confirmation email with a tracking number. You can use this number to track your package on the carrier's website.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">What is your return policy?</div>
+                <div class="faq-answer">
+                    We accept returns within 30 days of purchase. Items must be in original condition with all packaging and accessories. Please contact our support team to initiate a return.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">How long does shipping take?</div>
+                <div class="faq-answer">
+                    Standard shipping typically takes 3-5 business days. Express shipping options are available at checkout for faster delivery.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Do you offer international shipping?</div>
+                <div class="faq-answer">
+                    Yes, we ship to most countries worldwide. International shipping rates and delivery times vary by location.
+                </div>
+            </div>
+            
+            <div class="contact-form">
+                <h2>Contact Us</h2>
+                <p>Can't find the answer you're looking for? Please fill out the form below.</p>
+                
+                <form>
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="orderNumber">Order Number (if applicable)</label>
+                        <input type="text" id="orderNumber">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <footer style="margin-top: 50px; text-align: center; color: #777;">
+        &copy; 2024 TechStore. All rights reserved.
+    </footer>
+</body>
+</html>
+`
+)
+
 // setupRouter configures and returns the Gin router
 func setupRouter() *gin.Engine {
 	// Define modo release para Gin
@@ -141,17 +706,33 @@ func setupRouter() *gin.Engine {
 		},
 	})
 
-	// Carrega templates usando caminhos absolutos
-	templatePath := filepath.Join(dir, "templates")
-	log.Printf("Loading templates from: %s", templatePath)
-	r.LoadHTMLFiles(
-		filepath.Join(templatePath, "home.html"),
-		filepath.Join(templatePath, "products.html"),
-		filepath.Join(templatePath, "product-detail.html"),
-		filepath.Join(templatePath, "cart.html"),
-		filepath.Join(templatePath, "support.html"),
-		filepath.Join(templatePath, "checkout.html"),
-	)
+	// Verifica se estamos no ambiente Vercel
+	if isVercelEnvironment() {
+		log.Printf("Using embedded templates for Vercel environment")
+		
+		// Parse templates from strings
+		tmpl := template.New("templates").Funcs(r.FuncMap)
+		template.Must(tmpl.New("home.html").Parse(homeTemplate))
+		template.Must(tmpl.New("products.html").Parse(productsTemplate))
+		template.Must(tmpl.New("product-detail.html").Parse(productDetailTemplate))
+		template.Must(tmpl.New("cart.html").Parse(cartTemplate))
+		template.Must(tmpl.New("checkout.html").Parse(checkoutTemplate))
+		template.Must(tmpl.New("support.html").Parse(supportTemplate))
+		
+		r.SetHTMLTemplate(tmpl)
+	} else {
+		// Carrega templates usando caminhos absolutos para ambiente local
+		templatePath := filepath.Join(dir, "templates")
+		log.Printf("Loading templates from: %s", templatePath)
+		r.LoadHTMLFiles(
+			filepath.Join(templatePath, "home.html"),
+			filepath.Join(templatePath, "products.html"),
+			filepath.Join(templatePath, "product-detail.html"),
+			filepath.Join(templatePath, "cart.html"),
+			filepath.Join(templatePath, "support.html"),
+			filepath.Join(templatePath, "checkout.html"),
+		)
+	}
 
 	// Serve arquivos estáticos com caminho absoluto
 	staticPath := filepath.Join(dir, "static")
